@@ -678,12 +678,10 @@ namespace Lime
                             }
                             else if (Operators.CompareString(left4, "!", false) == 0)
                             {
-                                pr(0);
                                 ProjectData.EndApp();
                             }
                             else if (Operators.CompareString(left4, "@", false) == 0)
                             {
-                                pr(0);
                                 Process.Start(CurrentAssemblyFileInfo.FullName);
                                 ProjectData.EndApp();
                             }
@@ -843,19 +841,6 @@ namespace Lime
                     text += b.ToString("x2");
                 }
                 return text;
-            }
-        }
-
-        public static void pr(int i)
-        {
-            try
-            {
-                NtSetInformationProcess(Process.GetCurrentProcess().Handle, 29, ref i, 4);
-            }
-            catch (Exception expr_17)
-            {
-                ProjectData.SetProjectError(expr_17);
-                ProjectData.ClearProjectError();
             }
         }
 
