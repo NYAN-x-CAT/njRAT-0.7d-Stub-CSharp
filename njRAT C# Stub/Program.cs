@@ -14,11 +14,11 @@ namespace Lime
 
 
     public class Program
-	{
-		[STAThread]
-		public static void Main()
-		{
-			Core.Start();
-		}
-	}
+    {
+        [STAThread]
+        public static void Main()
+        {
+            Core.Start();
+        }
+    }
 }

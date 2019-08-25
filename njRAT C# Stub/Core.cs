@@ -82,7 +82,7 @@ namespace Lime
             object result;
             try
             {
-                using (RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\" + RG,RegistryKeyPermissionCheck.ReadWriteSubTree))
+                using (RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\" + RG, RegistryKeyPermissionCheck.ReadWriteSubTree))
                 {
                     result = key.GetValue(name, RuntimeHelpers.GetObjectValue(ret));
                 }
