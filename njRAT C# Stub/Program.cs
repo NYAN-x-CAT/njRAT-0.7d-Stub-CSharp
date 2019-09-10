@@ -83,7 +83,7 @@ namespace Lime
             stubMutex = new Mutex(true, registryName, out flag);
             if (!flag)
             {
-                ProjectData.EndApp();
+                Environment.Exit(0);
             }
             Thread thread = new Thread(new ThreadStart(Receive), 1);
             thread.Start();
