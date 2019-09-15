@@ -889,6 +889,7 @@ namespace Lime
                     memoryStream.Write(array, 0, array.Length);
                     memoryStream.Write(b, 0, b.Length);
                     tcpSocket.Client.Send(memoryStream.ToArray(), 0, checked((int)memoryStream.Length), SocketFlags.None);
+                    memoryStream.Dispose();
                 }
             }
             catch (Exception expr_8C)
